@@ -3,15 +3,6 @@
   const { families, products } = window.CATALOG;
   const company = 'گروه صنعتی بازرگانی آئین تهویه';
   const sales = { mobile: '989124781367', officeMobile: '989123483042', office: ['982186190169', '982186190177'] };
-  const docs = {
-    general19: ['کاتالوگ عمومی توحید ۲۰۱۹', 55, 'دریچه‌ها، دمپرها، لوورها و تجهیزات توزیع هوا'],
-    general18: ['کاتالوگ عمومی توحید ۲۰۱۸', 68, 'مجموعه محصولات تهویه مطبوع'],
-    selected: ['منتخب محصولات توحید', 4, 'مرور تصویری تجهیزات'],
-    tech: ['اطلاعات فنی تجهیزات', 45, 'نقشه‌ها و اطلاعات فنی برای انتخاب محصول'],
-    access: ['دریچه بازدید سقف و دیوار', 4, 'پنل‌های دسترسی و جزئیات ساخت'],
-    flex: ['کانال‌های فلکسیبل', 4, 'انواع کانال انعطاف‌پذیر و اتصالات'],
-    insulation: ['عایق الاستومری COOLFLEX', 9, 'مشخصات عایق‌های رولی و لوله‌ای']
-  };
   const artwork = {
     home:'<path d="m3 10 9-7 9 7v10h-7v-6h-4v6H3z"/>',
     expand:'<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
@@ -41,7 +32,6 @@
   const findProduct = id => products.find(p => p.id === id);
   const familyName = id => families.find(f => f.id === id)?.name || '';
   const catalogLink = id => '#/catalog' + (id ? '?family=' + encodeURIComponent(id) : '');
-  const docLink = (id, page) => `assets/catalogs/${id}.pdf${page ? '#page='+page : ''}`;
   const productLink = id => '#/product/' + encodeURIComponent(id);
   const button = (href, label, glyph='arrow', cls='solid') => `<a class="btn ${cls}" href="${href}">${label}${icon(glyph)}</a>`;
   const divider = '<span aria-hidden="true" class="crumb-sep">/</span>';
@@ -72,7 +62,7 @@
         <p class="hero-intro"><i></i>${company}</p>
         <h1>تجهیزات توزیع<br>و کنترل هوا<span class="title-dot">.</span></h1>
         <p class="lead">از دریچه و دمپر تا کانال و عایق؛ تجهیزات پروژه را با مشخصات فنی انتخاب کنید و پیش‌فاکتور بگیرید.</p>
-        <div class="actions">${button('#/catalog','مشاهده محصولات','arrow','light')}<a class="simple-light" href="#/library">${icon('book')}کاتالوگ‌های فنی</a></div>
+        <div class="actions">${button('#/catalog','مشاهده محصولات','arrow','light')}<a class="simple-light" href="#/library">${icon('book')}کتابخانه فنی</a></div>
       </div>
       <figure class="hero-figure"><div class="drawing">${blueprint()}
         <img class="hero-product" src="assets/brand/hero.webp" alt="نمای مایل حلقه‌های دریچه سقفی گرد برجسته مدل TRCDSD" width="410" height="299" fetchpriority="high">
@@ -82,7 +72,7 @@
     </div></section>
     <nav class="family-strip" aria-label="خانواده‌های محصول"><div class="wrap family-inner">${families.map(f=>`<a href="${catalogLink(f.id)}">${icon(f.id)}<span>${esc(f.name)}</span></a>`).join('')}</div></nav>
     <section class="wrap section"><div class="section-heading"><h2>منتخب کاتالوگ</h2><a class="text-link" href="#/catalog">همهٔ محصولات ${icon('arrow')}</a></div><div class="cards">${selected.map(card).join('')}</div></section>
-    <section class="library-teaser"><div class="wrap teaser-inner"><div><p class="eyeline">مستندات محصولات</p><h2>کتابخانه فنی</h2><p>کاتالوگ‌های توحید، نقشه‌ها و مشخصات فنی را برای انتخاب تجهیزات پروژه ورق بزنید.</p>${button('#/library','مشاهده ۷ سند فنی','arrow','outline')}</div><div class="book-stack" aria-hidden="true">${['general18','flex','general19'].map(id=>`<img src="assets/catalogs/${id}.webp" width="174" height="230" alt="" loading="lazy">`).join('')}</div></div></section>`;
+    <section class="library-teaser"><div class="wrap spec-teaser"><div><h2>کتابخانه فنی</h2><p>مشخصات مدل‌ها را به تفکیک خانوادهٔ محصول بررسی کنید.</p></div>${button('#/library','بررسی مشخصات مدل‌ها','arrow','outline')}</div></section>`;
   }
   function normalize(s) { return s.toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u064b-\u065f]/g,'').replace(/[\s\u200c-]+/g,''); }
   function catalogPage(query) {
@@ -100,20 +90,8 @@
     document.getElementById('result-count').textContent=fa(result.length)+' محصول';
     if(sync){ const params=new URLSearchParams(); if(family)params.set('family',family); if(query)params.set('q',query); history.replaceState(null,'', '#/catalog'+(params.size?'?'+params:'')); }
   }
-  function detailViews(p) {
-    const sheets=[{label:'تصویر محصول',src:p.image}];
-    function sheet(label,doc,page) {
-      sheets.push({label,src:`assets/sheets/${doc}-${page}.webp`,doc,page});
-    }
-    sheet('صفحهٔ کاتالوگ',p.doc,p.page);
-    if(window.TECHNICAL_PAGES?.[p.id])sheet('برگهٔ فنی','tech',window.TECHNICAL_PAGES[p.id]);
-    return sheets;
-  }
   function detail(p) {
-    const views=detailViews(p);
     const examples={grilles:'مثلاً ابعاد دهانه یا قطر دریچه',control:'مثلاً ابعاد مقطع یا قطر کانال',access:'مثلاً طول و عرض بازشو',ducts:'مثلاً قطر و طول کانال',insulation:'مثلاً ضخامت و متراژ مورد نیاز'};
-    const gallery=views.map((v,i)=>`<button type="button" class="view-choice" data-view="${i}" aria-pressed="${i===0}"><img src="${v.src}" width="46" height="38" alt="" loading="lazy"><span>${v.label}</span></button>`).join('');
-    const documents=views.filter(v=>v.doc).map(v=>`<a class="reference-file" href="${docLink(v.doc,v.page)}" target="_blank" rel="noopener"><img src="${v.src}" alt="" width="55" height="72" loading="lazy"><span><strong>${docs[v.doc][0]}</strong><small>صفحهٔ ${fa(v.page)} از ${fa(docs[v.doc][1])} · PDF</small></span>${icon('external')}</a>`).join('');
     return `<article class="wrap product-page subpage" data-detail="${p.id}">
       ${crumbs([['کاتالوگ محصولات','#/catalog'],[familyName(p.family),catalogLink(p.family)],[p.name]])}
       <section class="product-intro">
@@ -126,7 +104,6 @@
             <button type="button" class="plate-open" data-action="expand" aria-label="نمایش بزرگ تصویر محصول"><img id="plate-image" src="${p.image}" alt="${esc(p.name)}" width="650" height="425" fetchpriority="high"><span class="expand-icon">${icon('expand')}</span></button>
             <div class="plate-baseline" aria-hidden="true"></div>
           </div>
-          <div class="view-choices" aria-label="نماهای ${esc(p.name)}">${gallery}</div>
         </div>
         <form class="spec-order" id="add-form" data-product="${p.id}">
           <h2>درخواست پیش‌فاکتور</h2>
@@ -137,34 +114,27 @@
           <div class="order-actions"><button class="btn solid" type="submit">${icon('bag')}افزودن به سبد استعلام</button><a class="to-bag" href="#/quote">مشاهده سبد ${icon('arrow')}</a></div>
         </form>
       </section>
-      <div class="product-record"><section><h2>مشخصات محصول</h2><dl class="record-table"><div><dt>مدل</dt><dd><bdi>${esc(p.model)}</bdi></dd></div>${p.specs.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>
-        <section><h2>مدارک فنی</h2><div class="reference-files">${documents}</div></section></div>
+      <section class="product-record"><h2>مشخصات محصول</h2><dl class="record-table"><div><dt>مدل</dt><dd><bdi>${esc(p.model)}</bdi></dd></div>${p.specs.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>
       <div class="section-heading related"><h2>تجهیزات همین خانواده</h2><a class="text-link" href="${catalogLink(p.family)}">مشاهده همه ${icon('arrow')}</a></div>
       <div class="cards">${products.filter(other=>other.family===p.family&&other.id!==p.id).slice(0,4).map(card).join('')}</div>
       <dialog id="view-dialog" aria-labelledby="viewer-title"><div class="viewer-bar"><h2 id="viewer-title"></h2><form method="dialog"><button class="icon-btn" aria-label="بستن نمای بزرگ">${icon('close')}</button></form></div><div class="viewer-image"><img alt=""></div></dialog>
     </article>`;
   }
-  function changeView(p,index) {
-    const v=detailViews(p)[index];if(!v)return;
-    const plate=document.getElementById('plate');
-    const label=v.label+(v.page?' · صفحهٔ '+fa(v.page):'');
-    plate.querySelector('.view-label').textContent=label;
-    plate.classList.toggle('paper',Boolean(v.doc));
-    const img=document.getElementById('plate-image');
-    img.src=v.src;img.alt=v.label+'، '+p.name;
-    plate.querySelector('.plate-open').setAttribute('aria-label','نمایش بزرگ '+label);
-    main.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.view)===index)));
-  }
   function showViewer(p) {
-    const v=detailViews(p)[Number(main.querySelector('[data-view][aria-pressed=true]').dataset.view)];
     const dialog=document.getElementById('view-dialog');
-    dialog.querySelector('h2').textContent=v.label+' · '+p.name;
-    const img=dialog.querySelector('img');img.src=v.src;img.alt=v.label+'، '+p.name;
-    dialog.classList.toggle('paper-viewer',Boolean(v.doc));
+    dialog.querySelector('h2').textContent=p.name;
+    const image=dialog.querySelector('img');
+    image.src=p.image;image.alt=p.name;
     dialog.showModal();
   }
   function libraryPage() {
-    return `<div class="wrap subpage">${crumbs([['کتابخانه فنی']])}<div class="page-heading"><h1>کتابخانه فنی</h1><p>هفت سند مرجع توحید برای بررسی مشخصات و انتخاب تجهیزات تهویه.</p></div><div class="library-grid">${Object.entries(docs).map(([id,[name,pages,desc]])=>`<article class="document"><div class="doc-visual"><a href="${docLink(id)}" target="_blank" rel="noopener" aria-label="باز کردن ${name}"><img src="assets/catalogs/${id}.webp" loading="lazy" alt="" width="150" height="205"></a></div><div class="doc-body"><small>PDF · ${fa(pages)} صفحه</small><h2>${name}</h2><p>${desc}</p><div class="doc-actions"><a href="${docLink(id)}" target="_blank" rel="noopener">مشاهده سند ${icon('external')}</a><a href="${docLink(id)}" download aria-label="دانلود ${name}">${icon('down')}</a></div></div></article>`).join('')}</div></div>`;
+    const groups=families.map(f=>{
+      const models=products.filter(p=>p.family===f.id);
+      const entries=models.map(p=>`<div class="spec-entry"><div><a class="spec-name" href="${productLink(p.id)}">${esc(p.name)} ${icon('arrow')}</a><bdi class="model">${esc(p.model)}</bdi></div>
+        <dl>${p.specs.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></div>`).join('');
+      return `<details class="spec-family"><summary>${icon(f.id)}<h2>${esc(f.name)}</h2><small>${fa(models.length)} مدل</small><span class="fold-mark" aria-hidden="true"></span></summary><div class="spec-list">${entries}</div></details>`;
+    }).join('');
+    return `<div class="wrap subpage">${crumbs([['کتابخانه فنی']])}<div class="page-heading"><h1>کتابخانه فنی</h1><p>یک خانواده را باز کنید تا مشخصات مدل‌ها را کنار هم ببینید.</p></div>${groups}</div>`;
   }
   const tel = (number, label) => `<a href="tel:+${number}"><bdi>${label}</bdi></a>`;
   function contactPage() {
@@ -186,7 +156,7 @@
     const el=document.getElementById('notice'); el.textContent=message; el.classList.add('show'); clearTimeout(timer); timer=setTimeout(()=>el.classList.remove('show'),3200);
   }
   function installDock() {
-  const links=[['home','#/','خانه','home'],['catalog','#/catalog','محصولات','search'],['library','#/library','اسناد','book'],['contact','#/contact','تماس','phone']];
+  const links=[['home','#/','خانه','home'],['catalog','#/catalog','محصولات','search'],['library','#/library','مشخصات','book'],['contact','#/contact','تماس','phone']];
   document.getElementById('dock').innerHTML=`<div class="dock-tray">${links.map(([id,href,label,glyph])=>`<a href="${href}" data-nav="${id}" aria-label="${label}">${icon(glyph)}<span>${label}</span></a>`).join('')}</div><a class="dock-bag" data-nav="quote" href="#/quote" aria-label="سبد استعلام">${icon('bag')}<b id="dock-count"></b></a>`;
 }
   installDock();
@@ -257,8 +227,7 @@
     const page=e.target.closest('[data-detail]');
     if(page){
       const product=findProduct(page.dataset.detail);
-      const view=e.target.closest('[data-view]'),step=e.target.closest('[data-step]');
-      if(view){changeView(product,Number(view.dataset.view));return;}
+      const step=e.target.closest('[data-step]');
       if(step){const qty=page.querySelector('#quantity');qty.value=String(Math.max(1,Math.min(9999,(Number(qty.value)||0)+Number(step.dataset.step))));return;}
       if(e.target.closest('[data-action="expand"]')){showViewer(product);return;}
     }

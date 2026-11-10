@@ -3,3 +3,7 @@ node_modules/
 Thumbs.db
 *.log
 .env
+assets/catalogs/*.pdf
+assets/catalogs/*.webp
+assets/sheets/*.webp
+technical-pages.js
