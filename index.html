@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#013e37">
   <meta name="description" content="کاتالوگ گروه صنعتی بازرگانی آئین تهویه. انتخاب دریچه، دمپر، کانال فلکسیبل و عایق، بررسی اطلاعات فنی و درخواست پیش‌فاکتور.">
   <title>گروه صنعتی بازرگانی آئین تهویه | کاتالوگ تجهیزات تهویه</title>
@@ -10,6 +10,7 @@
   <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/vazirmatn-arabic-wght-normal.woff2" crossorigin>
   <link rel="stylesheet" href="./style.css">
   <script defer src="./data.js"></script>
+  <script defer src="./technical-pages.js"></script>
   <script defer src="./site.js"></script>
 </head>
 <body>
@@ -20,7 +21,6 @@
         <img src="./assets/brand/logo.png" width="44" height="47" alt="">
         <span><strong>آئین تهویه</strong><small lang="en">AEIN TAHVIE</small></span>
       </a>
-      <button class="mobile-menu icon-btn" id="menu-toggle" aria-label="منوی اصلی" aria-controls="main-nav" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/></svg></button>
       <nav id="main-nav" aria-label="منوی اصلی">
         <a href="#/" data-nav="home">صفحه نخست</a>
         <a href="#/catalog" data-nav="catalog">کاتالوگ محصولات</a>
@@ -31,6 +31,7 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5h14l1 13H4l1-13ZM8.5 8V6a3.5 3.5 0 0 1 7 0v2"/></svg>
         <span>سبد استعلام</span><b id="bag-count">۰</b>
       </a>
+      <a class="mobile-sales" href="tel:+989124781367" aria-label="تماس تلفنی با فروش"><span>واحد فروش</span><bdi>۰۹۱۲ ۴۷۸ ۱۳۶۷</bdi></a>
     </div>
   </header>
   <main id="main" tabindex="-1"></main>
@@ -41,6 +42,7 @@
       <a class="footer-phone" href="tel:+989124781367" dir="ltr">۰۹۱۲ ۴۷۸ ۱۳۶۷</a>
     </div>
   </footer>
+  <nav id="dock" class="mobile-dock" aria-label="دسترسی سریع موبایل"></nav>
   <div id="notice" class="notice" role="status" aria-live="polite"></div>
   <noscript>برای مرور محصولات و ساخت فهرست خرید، جاوااسکریپت مرورگر را فعال کنید. شماره فروش آئین تهویه ۰۹۱۲۴۷۸۱۳۶۷ است.</noscript>
 </body>
