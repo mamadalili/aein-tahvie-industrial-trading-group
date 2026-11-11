@@ -190,6 +190,43 @@
   }
   installDock();
   const productsMenu = document.getElementById('products-menu');
+  const mobileLayout = matchMedia('(max-width:760px)');
+  function installMobileHeader() {
+    const hamburger = document.querySelector('.hamburger');
+    const nav = document.getElementById('main-nav');
+    function setOpen(open) {
+      nav.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', String(open));
+      hamburger.setAttribute('aria-label', open ? 'بستن منوی اصلی' : 'باز کردن منوی اصلی');
+    }
+    hamburger.addEventListener('click', event => {
+      const opening = !nav.classList.contains('open');
+      setOpen(opening);
+      if (opening && event.detail === 0) nav.querySelector('a').focus();
+    });
+    function dismissOutside(event) {
+      if (!nav.classList.contains('open') || nav.contains(event.target) || hamburger.contains(event.target) || productsMenu.contains(event.target)) return;
+      setOpen(false);
+    }
+    document.addEventListener('pointerdown', dismissOutside);
+    document.addEventListener('focusin', dismissOutside);
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !nav.classList.contains('open') || nav.querySelector('.products-toggle').getAttribute('aria-expanded') === 'true') return;
+      setOpen(false);
+      hamburger.focus();
+    });
+    function followLink(event) {
+      const link = event.target.closest('a[href]');
+      if (!link || !nav.classList.contains('open') || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      setOpen(false);
+      if (link.hash === location.hash) main.focus({preventScroll:true});
+    }
+    nav.addEventListener('click', followLink);
+    productsMenu.addEventListener('click', followLink);
+    window.addEventListener('hashchange', () => setOpen(false));
+    mobileLayout.addEventListener('change', () => setOpen(false));
+  }
+  installMobileHeader();
   function installProductsMenu() {
     const triggers = document.querySelectorAll('[popovertarget="products-menu"]');
     if (!productsMenu.showPopover) {
@@ -197,7 +234,9 @@
       triggers.forEach(trigger => trigger.addEventListener('click', () => {location.hash='/catalog';}));
       return;
     }
-    const mobile = matchMedia('(max-width:760px)');
+    triggers.forEach(trigger => trigger.addEventListener('click', () => {
+      productsMenu.dataset.origin = trigger.closest('.header') ? 'header' : 'dock';
+    }));
     productsMenu.innerHTML = `<div class="mega-top"><a href="#/catalog">همهٔ محصولات ${icon('arrow')}</a>
       <button class="icon-btn" type="button" popovertarget="products-menu" popovertargetaction="hide" aria-label="بستن منوی محصولات">${icon('close')}</button></div>
       <div class="mega-layout"><div class="mega-families" aria-label="دسته‌های محصولات">
@@ -229,7 +268,7 @@
       if (choice) {
         showFamily(choice.dataset.menuFamily);
         productsMenu.dataset.view = 'models';
-        if (mobile.matches) panel.querySelector('[data-menu-back]').focus();
+        if (mobileLayout.matches) panel.querySelector('[data-menu-back]').focus();
       } else if (event.target.closest('[data-menu-back]')) {
         productsMenu.dataset.view = 'families';
         productsMenu.querySelector('[aria-pressed="true"]').focus();
@@ -238,7 +277,7 @@
       }
     });
     window.addEventListener('hashchange', () => productsMenu.hidePopover());
-    mobile.addEventListener('change', () => productsMenu.hidePopover());
+    mobileLayout.addEventListener('change', () => productsMenu.hidePopover());
   }
   installProductsMenu();
   function updateCount() {
