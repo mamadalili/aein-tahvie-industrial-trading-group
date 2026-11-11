@@ -17,11 +17,11 @@ window.CATALOG = {
     tmaod: 41, toadbd: 43
   },
   families: [
-    {"id":"grilles","name":"دریچه و دیفیوزر","en":"Grilles & diffusers"},
-    {"id":"control","name":"دمپر، لوور و صداگیر","en":"Airflow control"},
-    {"id":"access","name":"دریچه و درب بازدید","en":"Access panels"},
-    {"id":"ducts","name":"کانال فلکسیبل و اتصالات","en":"Flexible ducts"},
-    {"id":"insulation","name":"عایق الاستومری","en":"Elastomeric insulation"},
+    {"id":"grilles","name":"دریچه و دیفیوزر","en":"Grilles & diffusers","description":"دریچه‌های سقفی، خطی و دیواری برای توزیع هوای رفت و جمع‌آوری هوای برگشت."},
+    {"id":"control","name":"دمپر، لوور و صداگیر","en":"Airflow control","description":"دمپرهای گرد و چهارگوش برای تنظیم جریان، لوورهای ورودی هوا و صداگیرهای کانال."},
+    {"id":"access","name":"دریچه و درب بازدید","en":"Access panels","description":"دریچه‌های مخفی، تک‌لنگه و دولنگه برای دسترسی به فن‌کویل و تأسیسات پشت سقف یا دیوار."},
+    {"id":"ducts","name":"کانال فلکسیبل و اتصالات","en":"Flexible ducts","description":"کانال‌های انعطاف‌پذیر با روکش‌ها و عایق‌های مختلف، همراه با رابط‌های اتصال کانال."},
+    {"id":"insulation","name":"عایق الاستومری","en":"Elastomeric insulation","description":"عایق‌های رولی برای سطوح و کانال‌ها و عایق‌های لوله‌ای برای خطوط تأسیسات."},
   ],
   products: [
     {"id":"tfrcd","family":"grilles","name":"دریچه سقفی گرد تخت","en":"Flat round ceiling diffuser","model":"TFRCD","description":"پره‌های هم‌مرکز در یک سطح قرار می‌گیرند تا هوا را دور تا دور دریچه در سقف پخش کنند.","specs":[["محل نصب","سقف"],["شکل دهانه","گرد"],["آرایش پره","تخت"]],"doc":"general19","page":5,"image":"assets/products/tfrcd.webp"},

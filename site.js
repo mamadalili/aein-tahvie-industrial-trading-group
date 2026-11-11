@@ -31,7 +31,8 @@
   const main = document.getElementById('main');
   const findProduct = id => products.find(p => p.id === id);
   const familyName = id => families.find(f => f.id === id)?.name || '';
-  const catalogLink = id => '#/catalog' + (id ? '?family=' + encodeURIComponent(id) : '');
+  const catalogLink = id => id ? '#/category/' + encodeURIComponent(id) : '#/catalog';
+  const familyProducts = id => products.filter(product => product.family === id);
   const productLink = id => '#/product/' + encodeURIComponent(id);
   const button = (href, label, glyph='arrow', cls='solid') => `<a class="btn ${cls}" href="${href}">${label}${icon(glyph)}</a>`;
   const divider = '<span aria-hidden="true" class="crumb-sep">/</span>';
@@ -75,25 +76,32 @@
     <section class="library-teaser"><div class="wrap spec-teaser"><div><h2>کتابخانه فنی</h2><p>کاتالوگ‌های آئین تهویه را دریافت کنید و مشخصات مدل‌ها را کنار هم ببینید.</p></div>${button('#/library','مشاهده کاتالوگ‌ها','arrow','outline')}</div></section>`;
   }
   function normalize(s) { return s.toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u064b-\u065f]/g,'').replace(/[\s\u200c-]+/g,''); }
-  function catalogPage(query) {
-    const family = families.some(f=>f.id===query.get('family')) ? query.get('family') : '';
-    return `<div class="wrap subpage">${crumbs([['کاتالوگ محصولات']])}<div class="page-heading"><h1>کاتالوگ محصولات</h1><p>بر اساس خانوادهٔ محصول یا کد مدل، تجهیزات مورد نیاز پروژه را پیدا کنید.</p></div>
-      <div class="catalog-tools"><div class="search-field">${icon('search')}<input id="search" type="search" aria-label="جست‌وجو در محصولات" placeholder="جست‌وجوی نام یا کد محصول…" value="${esc(query.get('q')||'')}"></div>
-      <label class="filter">خانواده محصول<select id="family"><option value="">همه خانواده‌ها</option>${families.map(f=>`<option value="${f.id}" ${f.id===family?'selected':''}>${esc(f.name)}</option>`).join('')}</select></label></div>
+  function categoryHeading(family) {
+    const featured = familyProducts(family.id)[0];
+    return `<div class="category-hero"><div class="category-copy"><h1>${esc(family.name)}</h1><p>${esc(family.description)}</p></div>
+      <a class="category-photo" href="${productLink(featured.id)}"><img src="${featured.image}" alt="" width="420" height="270">
+      <span>${esc(featured.name)} ${icon('arrow')}</span></a></div>`;
+  }
+  function catalogPage(query, family) {
+    const trail = family ? [['محصولات','#/catalog'],[family.name]] : [['محصولات']];
+    const heading = family ? categoryHeading(family) : `<div class="page-heading"><h1>محصولات</h1></div>
+      <nav class="category-directory" aria-label="دسته‌های محصولات">${families.map(f => `<a href="${catalogLink(f.id)}">${icon(f.id)}<strong>${esc(f.name)}</strong><small>${fa(familyProducts(f.id).length)} محصول</small></a>`).join('')}</nav>`;
+    return `<div class="wrap subpage">${crumbs(trail)}${heading}
+      <div class="catalog-tools"><div class="search-field">${icon('search')}<input id="search" data-family="${family?.id || ''}" type="search" aria-label="جست‌وجو در ${family ? esc(family.name) : 'همهٔ محصولات'}" placeholder="جست‌وجوی نام یا کد محصول…" value="${esc(query.get('q')||'')}"></div></div>
       <p id="result-count" class="counts" role="status"></p><div id="results" class="cards"></div></div>`;
   }
   function updateResults(sync=false) {
     const query=document.getElementById('search').value;
-    const family=document.getElementById('family').value;
+    const family=document.getElementById('search').dataset.family;
     const result=products.filter(p=>(!family||p.family===family)&&normalize([p.name,p.model,p.en,familyName(p.family)].join(' ')).includes(normalize(query)));
-    document.getElementById('results').innerHTML=result.length ? result.map(card).join('') : `<div class="empty"><h2>محصولی پیدا نشد</h2><p>کد مدل یا کلمهٔ کوتاه‌تری وارد کنید.</p><button class="btn outline" data-action="reset">نمایش همه محصولات</button></div>`;
+    document.getElementById('results').innerHTML=result.length ? result.map(card).join('') : `<div class="empty"><h2>محصولی پیدا نشد</h2><p>کد مدل یا کلمهٔ کوتاه‌تری وارد کنید.</p><button class="btn outline" data-action="reset">پاک کردن جست‌وجو</button></div>`;
     document.getElementById('result-count').textContent=fa(result.length)+' محصول';
-    if(sync){ const params=new URLSearchParams(); if(family)params.set('family',family); if(query)params.set('q',query); history.replaceState(null,'', '#/catalog'+(params.size?'?'+params:'')); }
+    if(sync){ const params=new URLSearchParams(); if(query)params.set('q',query); history.replaceState(null,'', catalogLink(family)+(params.size?'?'+params:'')); }
   }
   function detail(p) {
     const examples={grilles:'مثلاً ابعاد دهانه یا قطر دریچه',control:'مثلاً ابعاد مقطع یا قطر کانال',access:'مثلاً طول و عرض بازشو',ducts:'مثلاً قطر و طول کانال',insulation:'مثلاً ضخامت و متراژ مورد نیاز'};
     return `<article class="wrap product-page subpage" data-detail="${p.id}">
-      ${crumbs([['کاتالوگ محصولات','#/catalog'],[familyName(p.family),catalogLink(p.family)],[p.name]])}
+      ${crumbs([['محصولات','#/catalog'],[familyName(p.family),catalogLink(p.family)],[p.name]])}
       <section class="product-intro">
         <header class="product-heading"><a class="family-label" href="${catalogLink(p.family)}">${icon(p.family)}${esc(familyName(p.family))}</a>
           <h1>${esc(p.name)}</h1><div class="part-ident"><bdi>${esc(p.model)}</bdi><span dir="ltr" lang="en">${esc(p.en)}</span></div>
@@ -174,10 +182,65 @@
     const el=document.getElementById('notice'); el.textContent=message; el.classList.add('show'); clearTimeout(timer); timer=setTimeout(()=>el.classList.remove('show'),3200);
   }
   function installDock() {
-  const links=[['home','#/','خانه','home'],['catalog','#/catalog','محصولات','search'],['library','#/library','مشخصات','book'],['contact','#/contact','تماس','phone']];
-  document.getElementById('dock').innerHTML=`<div class="dock-tray">${links.map(([id,href,label,glyph])=>`<a href="${href}" data-nav="${id}" aria-label="${label}">${icon(glyph)}<span>${label}</span></a>`).join('')}</div><a class="dock-bag" data-nav="quote" href="#/quote" aria-label="سبد استعلام">${icon('bag')}<b id="dock-count"></b></a>`;
-}
+    const dockLink=(id,href,label,glyph)=>`<a href="${href}" data-nav="${id}" aria-label="${label}">${icon(glyph)}<span>${label}</span></a>`;
+    document.getElementById('dock').innerHTML=`<div class="dock-tray">${dockLink('home','#/','خانه','home')}
+      <button type="button" data-nav="catalog" popovertarget="products-menu" aria-controls="products-menu" aria-expanded="false" aria-label="محصولات">${icon('grilles')}<span>محصولات</span></button>
+      ${dockLink('library','#/library','مشخصات','book')}${dockLink('contact','#/contact','تماس','phone')}</div>
+      <a class="dock-bag" data-nav="quote" href="#/quote" aria-label="سبد استعلام">${icon('bag')}<b id="dock-count"></b></a>`;
+  }
   installDock();
+  const productsMenu = document.getElementById('products-menu');
+  function installProductsMenu() {
+    const triggers = document.querySelectorAll('[popovertarget="products-menu"]');
+    if (!productsMenu.showPopover) {
+      productsMenu.hidden = true;
+      triggers.forEach(trigger => trigger.addEventListener('click', () => {location.hash='/catalog';}));
+      return;
+    }
+    const mobile = matchMedia('(max-width:760px)');
+    productsMenu.innerHTML = `<div class="mega-top"><a href="#/catalog">همهٔ محصولات ${icon('arrow')}</a>
+      <button class="icon-btn" type="button" popovertarget="products-menu" popovertargetaction="hide" aria-label="بستن منوی محصولات">${icon('close')}</button></div>
+      <div class="mega-layout"><div class="mega-families" aria-label="دسته‌های محصولات">
+      ${families.map(f=>`<button type="button" data-menu-family="${f.id}" aria-controls="menu-models">${icon(f.id)}<span>${esc(f.name)}</span><span class="nav-chevron" aria-hidden="true"></span></button>`).join('')}
+      </div><div class="mega-models" id="menu-models"></div></div>`;
+    const panel = productsMenu.querySelector('#menu-models');
+    const familyButtons = productsMenu.querySelectorAll('[data-menu-family]');
+    function showFamily(id) {
+      const models = familyProducts(id);
+      const name = esc(familyName(id));
+      familyButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.menuFamily === id)));
+      panel.innerHTML = `<button class="mega-back" type="button" data-menu-back>${icon('arrow')} دسته‌ها</button>
+        <div class="mega-heading"><strong>${name}</strong><a href="${catalogLink(id)}">مشاهدهٔ دسته ${icon('arrow')}</a></div>
+        <ul>${models.map(p=>`<li><a href="${productLink(p.id)}"><span>${esc(p.name)}</span><bdi>${esc(p.model)}</bdi></a></li>`).join('')}</ul>`;
+    }
+    productsMenu.addEventListener('beforetoggle', event => {
+      const opening = event.newState === 'open';
+      triggers.forEach(t => t.setAttribute('aria-expanded', String(opening)));
+      if (!opening) return;
+      const [,section,id] = location.hash.slice(1).split('?')[0].split('/');
+      const family = section === 'product' ? findProduct(id)?.family : section === 'category' && familyName(id) ? id : null;
+      showFamily(family || families[0].id);
+      productsMenu.dataset.view = 'families';
+      const headerBottom = Math.max(0, document.querySelector('.header').getBoundingClientRect().bottom);
+      productsMenu.style.setProperty('--menu-top',headerBottom+'px');
+    });
+    productsMenu.addEventListener('click', event => {
+      const choice = event.target.closest('[data-menu-family]');
+      if (choice) {
+        showFamily(choice.dataset.menuFamily);
+        productsMenu.dataset.view = 'models';
+        if (mobile.matches) panel.querySelector('[data-menu-back]').focus();
+      } else if (event.target.closest('[data-menu-back]')) {
+        productsMenu.dataset.view = 'families';
+        productsMenu.querySelector('[aria-pressed="true"]').focus();
+      } else if (event.target.closest('a')) {
+        productsMenu.hidePopover();
+      }
+    });
+    window.addEventListener('hashchange', () => productsMenu.hidePopover());
+    mobile.addEventListener('change', () => productsMenu.hidePopover());
+  }
+  installProductsMenu();
   function updateCount() {
     const count=fa(cart.lines.length);
     document.getElementById('bag-count').textContent=count;
@@ -206,17 +269,24 @@
     current=section || 'home'; const q=new URLSearchParams(search);
     let html,title;
     const p=current==='product' ? findProduct(id) : null;
+    const family=families.find(f => f.id === (current==='category' ? id : q.get('family')));
+    if(current==='catalog' && family){
+      q.delete('family');
+      history.replaceState(null,'',catalogLink(family.id)+(q.size?'?'+q:''));
+      current='category';
+    }
     if(current==='home'){html=homePage();title='کاتالوگ تجهیزات تهویه';}
-    else if(current==='catalog'){html=catalogPage(q);title='کاتالوگ محصولات';}
+    else if(current==='catalog'){html=catalogPage(q);title='محصولات';}
+    else if(current==='category' && family){html=catalogPage(q,family);title=family.name;}
     else if(current==='product'&&p){html=detail(p);title=p.name+' '+p.model;}
     else if(current==='library'){html=libraryPage();title='کتابخانه فنی';}
     else if(current==='quote'){html=quotePage();title='سبد استعلام';}
     else if(current==='contact'){html=contactPage();title='تماس با فروش';}
     else {html=`<div class="wrap subpage empty"><h1>صفحه پیدا نشد</h1>${button('#/catalog','بازگشت به محصولات')}</div>`;title='صفحه پیدا نشد';}
     main.innerHTML=html; document.title=title+' | '+company;
-    if(current==='catalog')updateResults();
+    if(current==='catalog' || (current==='category' && family))updateResults();
     for(const a of document.querySelectorAll('[data-nav],.quote-link')){
-      const active=a.dataset.nav===(current==='product'?'catalog':current)||(a.classList.contains('quote-link')&&current==='quote');
+      const active=a.dataset.nav===(['product','category'].includes(current)?'catalog':current)||(a.classList.contains('quote-link')&&current==='quote');
       if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');
     }
     if(focus){main.focus({preventScroll:true});window.scrollTo(0,0);}
@@ -225,7 +295,7 @@
 
   main.addEventListener('input',e=>{
     const el=e.target;
-    if(el.id==='search'||el.id==='family'){updateResults(true);return;}
+    if(el.id==='search'){updateResults(true);return;}
     if(el.matches('[data-note]')){const l=cart.lines[Number(el.closest('[data-line]').dataset.line)];if(l)l.note=el.value;}
     else if(el.id==='project'||el.id==='message'){cart[el.id]=el.value;}
     else return;
@@ -251,7 +321,7 @@
     }
     const control=e.target.closest('[data-action]');if(!control)return;
     const action=control.dataset.action;
-    if(action==='reset'){document.getElementById('search').value='';document.getElementById('family').value='';updateResults(true);document.getElementById('search').focus();return;}
+    if(action==='reset'){document.getElementById('search').value='';updateResults(true);document.getElementById('search').focus();return;}
     if(action==='download'){
       const url=URL.createObjectURL(new Blob(['\ufeff'+quoteText()],{type:'text/plain;charset=utf-8'}));
       const a=document.createElement('a');a.href=url;a.download='استعلام-آئین-تهویه.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;

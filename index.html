@@ -8,9 +8,9 @@
   <title>گروه صنعتی بازرگانی آئین تهویه | کاتالوگ تجهیزات تهویه</title>
   <link rel="icon" href="./assets/brand/logo.png">
   <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/vazirmatn-arabic-wght-normal.woff2" crossorigin>
-  <link rel="stylesheet" href="./style.css?v=aein-covers-2">
-  <script defer src="./data.js?v=aein-publications"></script>
-  <script defer src="./site.js?v=aein-publications"></script>
+  <link rel="stylesheet" href="./style.css?v=product-families">
+  <script defer src="./data.js?v=product-families"></script>
+  <script defer src="./site.js?v=product-families"></script>
 </head>
 <body>
   <a class="skip" href="#main">رفتن به محتوای اصلی</a>
@@ -22,7 +22,7 @@
       </a>
       <nav id="main-nav" aria-label="منوی اصلی">
         <a href="#/" data-nav="home">صفحه نخست</a>
-        <a href="#/catalog" data-nav="catalog">کاتالوگ محصولات</a>
+        <button class="products-toggle" type="button" data-nav="catalog" popovertarget="products-menu" aria-controls="products-menu" aria-expanded="false">محصولات<span class="nav-chevron" aria-hidden="true"></span></button>
         <a href="#/library" data-nav="library">کتابخانه فنی</a>
         <a href="#/contact" data-nav="contact">تماس با فروش</a>
       </nav>
@@ -33,6 +33,7 @@
       <a class="mobile-sales" href="tel:+989124781367" aria-label="تماس تلفنی با فروش"><span>واحد فروش</span><bdi>۰۹۱۲ ۴۷۸ ۱۳۶۷</bdi></a>
     </div>
   </header>
+  <nav id="products-menu" popover aria-label="دسته‌ها و محصولات"></nav>
   <main id="main" tabindex="-1"></main>
   <footer class="footer">
     <div class="wrap footer-inner">
