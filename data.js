@@ -1,4 +1,21 @@
 window.CATALOG = {
+  publications: {
+    general19: { title: 'کاتالوگ جامع سری ۲۰۱۹', pages: 55 },
+    general18: { title: 'کاتالوگ جامع سری ۲۰۱۸', pages: 68 },
+    tech: { title: 'اطلاعات فنی', pages: 45 },
+    selected: { title: 'گزیدهٔ محصولات', pages: 4 },
+    access: { title: 'دریچهٔ بازدید', pages: 4 },
+    flex: { title: 'کانال فلکسیبل', pages: 4 },
+    insulation: { title: 'عایق الاستومری COOLFLEX', pages: 9 }
+  },
+  technicalPages: {
+    trcdsd: 4, tfrcd: 4, t4scd: 5, t2scd: 5, t1dabsg: 6, tcabsg: 7,
+    trgab: 8, tlbg30: 10, tlbgf: 11, tlbgt1: 12, tlsd4: 14, tlsd3: 14,
+    t4wcbd: 16, tscbd: 17, tsec: 20, tsecdd: 24, twfdecg: 27, tsad: 29,
+    ttad: 29, tsrgf: 30, twaf: 30, trdd: 32, tpbdf: 32, tsl: 34,
+    tril: 35, tsbd: 36, trbd: 37, tmrd: 37, tfsfd: 39, tss: 40,
+    tmaod: 41, toadbd: 43
+  },
   families: [
     {"id":"grilles","name":"دریچه و دیفیوزر","en":"Grilles & diffusers"},
     {"id":"control","name":"دمپر، لوور و صداگیر","en":"Airflow control"},

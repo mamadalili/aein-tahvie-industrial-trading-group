@@ -1,6 +1,6 @@
 (function app() {
   'use strict';
-  const { families, products } = window.CATALOG;
+  const { families, products, publications, technicalPages } = window.CATALOG;
   const company = 'گروه صنعتی بازرگانی آئین تهویه';
   const sales = { mobile: '989124781367', officeMobile: '989123483042', office: ['982186190169', '982186190177'] };
   const artwork = {
@@ -72,7 +72,7 @@
     </div></section>
     <nav class="family-strip" aria-label="خانواده‌های محصول"><div class="wrap family-inner">${families.map(f=>`<a href="${catalogLink(f.id)}">${icon(f.id)}<span>${esc(f.name)}</span></a>`).join('')}</div></nav>
     <section class="wrap section"><div class="section-heading"><h2>منتخب کاتالوگ</h2><a class="text-link" href="#/catalog">همهٔ محصولات ${icon('arrow')}</a></div><div class="cards">${selected.map(card).join('')}</div></section>
-    <section class="library-teaser"><div class="wrap spec-teaser"><div><h2>کتابخانه فنی</h2><p>مشخصات مدل‌ها را به تفکیک خانوادهٔ محصول بررسی کنید.</p></div>${button('#/library','بررسی مشخصات مدل‌ها','arrow','outline')}</div></section>`;
+    <section class="library-teaser"><div class="wrap spec-teaser"><div><h2>کتابخانه فنی</h2><p>کاتالوگ‌های آئین تهویه را دریافت کنید و مشخصات مدل‌ها را کنار هم ببینید.</p></div>${button('#/library','مشاهده کاتالوگ‌ها','arrow','outline')}</div></section>`;
   }
   function normalize(s) { return s.toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u064b-\u065f]/g,'').replace(/[\s\u200c-]+/g,''); }
   function catalogPage(query) {
@@ -115,6 +115,7 @@
         </form>
       </section>
       <section class="product-record"><h2>مشخصات محصول</h2><dl class="record-table"><div><dt>مدل</dt><dd><bdi>${esc(p.model)}</bdi></dd></div>${p.specs.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>
+      <section class="product-record"><h2>مستندات این مدل</h2><div>${referenceLink(p.doc, p.page)}${technicalPages[p.id] ? referenceLink('tech', technicalPages[p.id]) : ''}</div></section>
       <div class="section-heading related"><h2>تجهیزات همین خانواده</h2><a class="text-link" href="${catalogLink(p.family)}">مشاهده همه ${icon('arrow')}</a></div>
       <div class="cards">${products.filter(other=>other.family===p.family&&other.id!==p.id).slice(0,4).map(card).join('')}</div>
       <dialog id="view-dialog" aria-labelledby="viewer-title"><div class="viewer-bar"><h2 id="viewer-title"></h2><form method="dialog"><button class="icon-btn" aria-label="بستن نمای بزرگ">${icon('close')}</button></form></div><div class="viewer-image"><img alt=""></div></dialog>
@@ -127,14 +128,31 @@
     image.src=p.image;image.alt=p.name;
     dialog.showModal();
   }
+  const publicationPath = id => 'assets/publications/' + id;
+  function referenceLink(id, page) {
+    const path = publicationPath(id);
+    return `<a class="reference-file" href="${path}.pdf#page=${page}" target="_blank" rel="noopener">
+      <img src="${path}.webp" alt="" width="44" height="55" loading="lazy">
+      <span><strong>${esc(publications[id].title)}</strong><small>مشاهدهٔ صفحهٔ ${fa(page)} در PDF</small></span>${icon('external')}</a>`;
+  }
+  function publicationCard([id, publication]) {
+    const path = publicationPath(id);
+    const title = esc(publication.title);
+    return `<article class="document"><div class="doc-visual"><img src="${path}.webp" alt="" loading="lazy"></div>
+      <div class="doc-body"><small>PDF · ${fa(publication.pages)} صفحه</small><h2>${title}</h2>
+      <div class="doc-actions"><a href="${path}.pdf" target="_blank" rel="noopener" aria-label="مشاهدهٔ ${title}">مشاهده ${icon('external')}</a>
+      <a href="${path}.pdf" download="آئین تهویه - ${title}.pdf" aria-label="دانلود ${title}">${icon('down')} دانلود</a></div></div></article>`;
+  }
   function libraryPage() {
     const groups=families.map(f=>{
       const models=products.filter(p=>p.family===f.id);
       const entries=models.map(p=>`<div class="spec-entry"><div><a class="spec-name" href="${productLink(p.id)}">${esc(p.name)} ${icon('arrow')}</a><bdi class="model">${esc(p.model)}</bdi></div>
         <dl>${p.specs.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></div>`).join('');
-      return `<details class="spec-family"><summary>${icon(f.id)}<h2>${esc(f.name)}</h2><small>${fa(models.length)} مدل</small><span class="fold-mark" aria-hidden="true"></span></summary><div class="spec-list">${entries}</div></details>`;
+      return `<details class="spec-family"><summary>${icon(f.id)}<span class="family-title">${esc(f.name)}</span><small>${fa(models.length)} مدل</small><span class="fold-mark" aria-hidden="true"></span></summary><div class="spec-list">${entries}</div></details>`;
     }).join('');
-    return `<div class="wrap subpage">${crumbs([['کتابخانه فنی']])}<div class="page-heading"><h1>کتابخانه فنی</h1><p>یک خانواده را باز کنید تا مشخصات مدل‌ها را کنار هم ببینید.</p></div>${groups}</div>`;
+    return `<div class="wrap subpage">${crumbs([['کتابخانه فنی']])}<div class="page-heading"><h1>کتابخانه فنی</h1><p>کاتالوگ‌ها و اطلاعات فنی گروه صنعتی بازرگانی آئین تهویه</p></div>
+      <div class="library-grid">${Object.entries(publications).map(publicationCard).join('')}</div>
+      <section class="library-models"><h2>مشخصات مدل‌ها به تفکیک خانواده</h2>${groups}</section></div>`;
   }
   const tel = (number, label) => `<a href="tel:+${number}"><bdi>${label}</bdi></a>`;
   function contactPage() {
