@@ -8,15 +8,15 @@
   <title>گروه صنعتی بازرگانی آئین تهویه | کاتالوگ تجهیزات تهویه</title>
   <link rel="icon" href="./assets/brand/logo.png">
   <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/vazirmatn-arabic-wght-normal.woff2" crossorigin>
-  <link rel="stylesheet" href="./style.css?v=mobile-header-1">
+  <link rel="stylesheet" href="./style.css?v=mobile-drawer-1">
   <script defer src="./data.js?v=product-families"></script>
-  <script defer src="./site.js?v=mobile-header-1"></script>
+  <script defer src="./site.js?v=mobile-drawer-1"></script>
 </head>
 <body>
   <a class="skip" href="#main">رفتن به محتوای اصلی</a>
   <header class="header">
     <div class="wrap header-inner">
-      <button class="hamburger" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="باز کردن منوی اصلی"><span></span><span></span><span></span></button>
+      <button class="hamburger" type="button" aria-controls="mobile-drawer" aria-haspopup="dialog" aria-expanded="false" aria-label="باز کردن منوی اصلی"><span></span><span></span><span></span></button>
       <a class="identity" href="#/" aria-label="آئین تهویه، صفحه نخست">
         <img src="./assets/brand/logo.png" width="44" height="47" alt="">
         <span><strong>آئین تهویه</strong><small lang="en">AEIN TAHVIE</small></span>
@@ -26,7 +26,6 @@
         <button class="products-toggle" type="button" data-nav="catalog" popovertarget="products-menu" aria-controls="products-menu" aria-expanded="false">محصولات<span class="nav-chevron" aria-hidden="true"></span></button>
         <a href="#/library" data-nav="library">کتابخانه فنی</a>
         <a href="#/contact" data-nav="contact">تماس با فروش</a>
-        <a class="nav-quote" href="#/quote" data-nav="quote">سبد استعلام</a>
       </nav>
       <a class="quote-link" href="#/quote">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5h14l1 13H4l1-13ZM8.5 8V6a3.5 3.5 0 0 1 7 0v2"/></svg>
@@ -35,6 +34,23 @@
       <a class="mobile-sales" href="tel:+989124781367" aria-label="تماس تلفنی با فروش"><span>واحد فروش</span><bdi>۰۹۱۲ ۴۷۸ ۱۳۶۷</bdi></a>
     </div>
   </header>
+  <dialog id="mobile-drawer" aria-label="منوی اصلی">
+    <div class="drawer-bar">
+      <div class="drawer-brand"><img src="./assets/brand/logo.png" width="31" height="34" alt=""><strong>آئین تهویه</strong></div>
+      <form method="dialog"><button class="icon-btn" autofocus aria-label="بستن منو"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></form>
+    </div>
+    <nav class="drawer-links" aria-label="منوی اصلی موبایل">
+      <a href="#/" data-nav="home">صفحه نخست</a>
+      <details class="drawer-products">
+        <summary data-nav="catalog">محصولات<span class="nav-chevron" aria-hidden="true"></span></summary>
+        <div class="drawer-categories"></div>
+        <a class="drawer-all" href="#/catalog">همهٔ محصولات</a>
+      </details>
+      <a href="#/library" data-nav="library">کتابخانه فنی</a>
+      <a href="#/contact" data-nav="contact">تماس با فروش</a>
+      <a href="#/quote" data-nav="quote">سبد استعلام</a>
+    </nav>
+  </dialog>
   <nav id="products-menu" popover aria-label="دسته‌ها و محصولات"></nav>
   <main id="main" tabindex="-1"></main>
   <footer class="footer">

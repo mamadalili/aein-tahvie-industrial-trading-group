@@ -355,7 +355,7 @@ body:has(#view-dialog[open]){overflow:hidden}
 .spec-name .ico{width:14px}
 @media(max-width:700px){.spec-entry,.product-record{grid-template-columns:1fr;gap:8px}.spec-family summary{gap:8px}.spec-teaser{padding-block:28px}}
 
-.hamburger,.header nav .nav-quote{display:none}
+.hamburger{display:none}
 .products-toggle{align-self:stretch;display:inline-flex;align-items:center;gap:9px;padding:0;font:inherit;color:var(--ink)}
 .products-toggle:is([aria-expanded=true],[aria-current]){font-weight:700;color:var(--pine)}
 .nav-chevron{width:7px;height:7px;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:translateY(-2px) rotate(45deg)}
@@ -396,28 +396,40 @@ body:has(#view-dialog[open]){overflow:hidden}
 @media(max-width:760px){
   .hamburger{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:44px;height:44px;flex:none;margin-inline-end:4px;padding:0;border:1px solid var(--line);border-radius:10px;color:var(--pine)}
   .hamburger span{display:block;width:19px;height:2px;border-radius:2px;background:currentColor;transition:transform .18s,opacity .18s}
-  .hamburger[aria-expanded=true]{background:var(--faint);border-color:#adc3b9}
-  .hamburger[aria-expanded=true] span:first-child{transform:translateY(6px) rotate(45deg)}
-  .hamburger[aria-expanded=true] span:nth-child(2){opacity:0}
-  .hamburger[aria-expanded=true] span:last-child{transform:translateY(-6px) rotate(-45deg)}
-  .header #main-nav{display:none;position:absolute;inset:calc(100% + 1px) auto auto;inset-inline-start:12px;width:min(340px,calc(100% - 24px));max-height:calc(100dvh - 150px);overflow:auto;overscroll-behavior:contain;padding:6px 12px;background:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px #04142a25}
-  .header #main-nav.open{display:grid;gap:0}
-  .header #main-nav.open:has(.products-toggle[aria-expanded=true]){opacity:0;pointer-events:none}
-  .header #main-nav :is(a,.products-toggle){display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:15px}
-  .header #main-nav a:last-child{border:0}
-  .header #main-nav [aria-current]{color:var(--pine);background:var(--faint);font-weight:650}
   .mobile-sales{margin-inline-start:auto}
-  #products-menu{inset:auto 8px calc(76px + env(safe-area-inset-bottom,0px));width:min(480px,calc(100% - 16px));max-height:calc(100dvh - 100px - env(safe-area-inset-bottom,0px));border-radius:15px;border-top-width:1px}
-  #products-menu[data-origin=header]{inset:calc(var(--menu-top) + 1px) auto auto;inset-inline-start:12px;width:min(420px,calc(100% - 24px));max-height:calc(100dvh - var(--menu-top) - 82px);margin:0}
-  .mega-layout{display:block}
-  .mega-top{padding:4px 14px}
-  .mega-families{padding:4px 8px 9px;background:var(--white)}
-  .mega-families button{min-height:48px;border-block-end:1px solid var(--line)}
-  #products-menu[data-view=families] .mega-models,#products-menu[data-view=models] .mega-families{display:none}
-  .mega-models{padding:0 14px 14px}
-  .mega-models ul{grid-template-columns:1fr}
-  .mega-back{display:inline-flex}
-  .mega-back .ico{transform:rotate(180deg)}
+  html:has(#mobile-drawer[open]){overflow:hidden}
+  #mobile-drawer{
+    position:fixed;inset:0 0 0 auto;margin:0;padding:0;border:0;
+    width:min(380px,calc(100% - 44px));max-width:none;height:100%;height:100dvh;max-height:none;
+    background:var(--white);color:var(--ink);box-shadow:-12px 0 40px #04142a2b;
+    transform:translateX(100%);transition:transform .24s cubic-bezier(.2,.7,.3,1);
+    transition:transform .24s cubic-bezier(.2,.7,.3,1),overlay .24s allow-discrete,display .24s allow-discrete;
+  }
+  #mobile-drawer[open]{display:flex;flex-direction:column;transform:translateX(0)}
+  #mobile-drawer::backdrop{background:#04142a66}
+  @starting-style{#mobile-drawer[open]{transform:translateX(100%)}}
+  .drawer-bar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 18px 10px;border-bottom:1px solid var(--line)}
+  .drawer-brand{display:flex;align-items:center;gap:9px;color:var(--pine);font-size:20px}
+  .drawer-bar .icon-btn{border-radius:50%;background:var(--faint);color:var(--pine)}
+  .drawer-links{min-height:0;overflow:auto;overscroll-behavior:contain;padding:6px 18px calc(16px + env(safe-area-inset-bottom,0px))}
+  .drawer-links summary{list-style:none;cursor:pointer}
+  .drawer-links summary::-webkit-details-marker{display:none}
+  .drawer-links>a,.drawer-products>summary,.drawer-family>summary{display:flex;align-items:center;gap:10px;min-height:51px;padding:9px 5px;color:var(--ink);font-weight:600}
+  .drawer-links>a,.drawer-products{border-bottom:1px solid var(--line)}
+  .drawer-links [aria-current],.drawer-products[open]>summary,.drawer-family[open]>summary{color:var(--pine)}
+  .drawer-links .nav-chevron{flex:none;margin-inline-start:auto;margin-inline-end:5px}
+  .drawer-links details[open]>summary>.nav-chevron{transform:translateY(2px) rotate(225deg)}
+  .drawer-categories{border-inline-start:2px solid #b1c7bd;background:var(--faint);padding-inline:9px}
+  .drawer-family+.drawer-family{border-top:1px solid var(--line)}
+  .drawer-family>summary{min-height:47px;font-size:14px}
+  .drawer-family>summary .ico{width:19px;height:19px;color:var(--pine)}
+  .drawer-family-body{padding:1px 10px 8px;background:var(--white)}
+  .drawer-family ul{list-style:none;padding:0;margin:0}
+  .drawer-family-body a,.drawer-all{display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 2px;font-size:13px}
+  .drawer-family-body li a{justify-content:space-between;border-top:1px solid var(--line)}
+  .drawer-family-body bdi{font:11px/1.4 var(--mono);color:var(--muted);text-align:end;overflow-wrap:anywhere}
+  .drawer-category-link,.drawer-all{color:var(--pine);font-weight:650}
+  .drawer-category-link .ico{width:15px;height:15px}
   .category-directory{grid-template-columns:repeat(2,minmax(0,1fr));border:0;gap:7px;margin-bottom:18px}
   .category-directory a,.category-directory a:last-child{border:1px solid var(--line);padding:10px;grid-template-columns:auto 1fr;align-items:center;gap:4px 8px}
   .category-directory small{grid-column:2}

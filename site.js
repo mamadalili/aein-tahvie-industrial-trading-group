@@ -184,49 +184,56 @@
   function installDock() {
     const dockLink=(id,href,label,glyph)=>`<a href="${href}" data-nav="${id}" aria-label="${label}">${icon(glyph)}<span>${label}</span></a>`;
     document.getElementById('dock').innerHTML=`<div class="dock-tray">${dockLink('home','#/','خانه','home')}
-      <button type="button" data-nav="catalog" popovertarget="products-menu" aria-controls="products-menu" aria-expanded="false" aria-label="محصولات">${icon('grilles')}<span>محصولات</span></button>
+      <button type="button" data-nav="catalog" aria-haspopup="dialog" aria-controls="mobile-drawer" aria-expanded="false" aria-label="محصولات">${icon('grilles')}<span>محصولات</span></button>
       ${dockLink('library','#/library','مشخصات','book')}${dockLink('contact','#/contact','تماس','phone')}</div>
       <a class="dock-bag" data-nav="quote" href="#/quote" aria-label="سبد استعلام">${icon('bag')}<b id="dock-count"></b></a>`;
   }
   installDock();
   const productsMenu = document.getElementById('products-menu');
   const mobileLayout = matchMedia('(max-width:760px)');
-  function installMobileHeader() {
-    const hamburger = document.querySelector('.hamburger');
-    const nav = document.getElementById('main-nav');
-    function setOpen(open) {
-      nav.classList.toggle('open', open);
-      hamburger.setAttribute('aria-expanded', String(open));
-      hamburger.setAttribute('aria-label', open ? 'بستن منوی اصلی' : 'باز کردن منوی اصلی');
-    }
-    hamburger.addEventListener('click', event => {
-      const opening = !nav.classList.contains('open');
-      setOpen(opening);
-      if (opening && event.detail === 0) nav.querySelector('a').focus();
-    });
-    function dismissOutside(event) {
-      if (!nav.classList.contains('open') || nav.contains(event.target) || hamburger.contains(event.target) || productsMenu.contains(event.target)) return;
-      setOpen(false);
-    }
-    document.addEventListener('pointerdown', dismissOutside);
-    document.addEventListener('focusin', dismissOutside);
-    document.addEventListener('keydown', event => {
-      if (event.key !== 'Escape' || !nav.classList.contains('open') || nav.querySelector('.products-toggle').getAttribute('aria-expanded') === 'true') return;
-      setOpen(false);
-      hamburger.focus();
-    });
-    function followLink(event) {
-      const link = event.target.closest('a[href]');
-      if (!link || !nav.classList.contains('open') || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-      setOpen(false);
-      if (link.hash === location.hash) main.focus({preventScroll:true});
-    }
-    nav.addEventListener('click', followLink);
-    productsMenu.addEventListener('click', followLink);
-    window.addEventListener('hashchange', () => setOpen(false));
-    mobileLayout.addEventListener('change', () => setOpen(false));
+  function modelLinks(models) {
+    return models.map(p => `<li><a href="${productLink(p.id)}"><span>${esc(p.name)}</span><bdi>${esc(p.model)}</bdi></a></li>`).join('');
   }
-  installMobileHeader();
+  function installMobileDrawer() {
+    const drawer = document.getElementById('mobile-drawer');
+    const productsGroup = drawer.querySelector('.drawer-products');
+    const hamburger = document.querySelector('.hamburger');
+    const dockProducts = document.querySelector('#dock [data-nav="catalog"]');
+    drawer.querySelector('.drawer-categories').innerHTML = families.map(family => {
+      const models = familyProducts(family.id);
+      return `<details class="drawer-family" name="drawer-family">
+        <summary>${icon(family.id)}<span>${esc(family.name)}</span><span class="nav-chevron" aria-hidden="true"></span></summary>
+        <div class="drawer-family-body"><a class="drawer-category-link" href="${catalogLink(family.id)}">مشاهدهٔ صفحهٔ دسته ${icon('arrow')}</a>
+        <ul>${modelLinks(models)}</ul></div></details>`;
+    }).join('');
+    function openDrawer(showProducts) {
+      drawer.querySelectorAll('.drawer-family[open]').forEach(family => { family.open = false; });
+      productsGroup.open = showProducts;
+      drawer.showModal();
+      drawer.querySelector('.drawer-links').scrollTop = 0;
+      hamburger.setAttribute('aria-expanded', 'true');
+      dockProducts.setAttribute('aria-expanded', 'true');
+    }
+    hamburger.addEventListener('click', () => openDrawer(false));
+    dockProducts.addEventListener('click', () => openDrawer(true));
+    drawer.addEventListener('close', () => {
+      hamburger.setAttribute('aria-expanded', String(drawer.open));
+      dockProducts.setAttribute('aria-expanded', String(drawer.open));
+    });
+    drawer.addEventListener('click', event => {
+      if (event.target === drawer && event.clientX < drawer.getBoundingClientRect().left) {
+        drawer.close();
+        return;
+      }
+      const link = event.target.closest('a[href]');
+      if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      drawer.close();
+      if (link.hash === location.hash) main.focus({preventScroll:true});
+    });
+    window.addEventListener('hashchange', () => { if (drawer.open) drawer.close(); });
+    mobileLayout.addEventListener('change', () => { if (drawer.open) drawer.close(); });
+  }
+  installMobileDrawer();
   function installProductsMenu() {
     const triggers = document.querySelectorAll('[popovertarget="products-menu"]');
     if (!productsMenu.showPopover) {
@@ -234,9 +241,6 @@
       triggers.forEach(trigger => trigger.addEventListener('click', () => {location.hash='/catalog';}));
       return;
     }
-    triggers.forEach(trigger => trigger.addEventListener('click', () => {
-      productsMenu.dataset.origin = trigger.closest('.header') ? 'header' : 'dock';
-    }));
     productsMenu.innerHTML = `<div class="mega-top"><a href="#/catalog">همهٔ محصولات ${icon('arrow')}</a>
       <button class="icon-btn" type="button" popovertarget="products-menu" popovertargetaction="hide" aria-label="بستن منوی محصولات">${icon('close')}</button></div>
       <div class="mega-layout"><div class="mega-families" aria-label="دسته‌های محصولات">
@@ -248,9 +252,8 @@
       const models = familyProducts(id);
       const name = esc(familyName(id));
       familyButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.menuFamily === id)));
-      panel.innerHTML = `<button class="mega-back" type="button" data-menu-back>${icon('arrow')} دسته‌ها</button>
-        <div class="mega-heading"><strong>${name}</strong><a href="${catalogLink(id)}">مشاهدهٔ دسته ${icon('arrow')}</a></div>
-        <ul>${models.map(p=>`<li><a href="${productLink(p.id)}"><span>${esc(p.name)}</span><bdi>${esc(p.model)}</bdi></a></li>`).join('')}</ul>`;
+      panel.innerHTML = `<div class="mega-heading"><strong>${name}</strong><a href="${catalogLink(id)}">مشاهدهٔ دسته ${icon('arrow')}</a></div>
+        <ul>${modelLinks(models)}</ul>`;
     }
     productsMenu.addEventListener('beforetoggle', event => {
       const opening = event.newState === 'open';
@@ -259,7 +262,6 @@
       const [,section,id] = location.hash.slice(1).split('?')[0].split('/');
       const family = section === 'product' ? findProduct(id)?.family : section === 'category' && familyName(id) ? id : null;
       showFamily(family || families[0].id);
-      productsMenu.dataset.view = 'families';
       const headerBottom = Math.max(0, document.querySelector('.header').getBoundingClientRect().bottom);
       productsMenu.style.setProperty('--menu-top',headerBottom+'px');
     });
@@ -267,11 +269,6 @@
       const choice = event.target.closest('[data-menu-family]');
       if (choice) {
         showFamily(choice.dataset.menuFamily);
-        productsMenu.dataset.view = 'models';
-        if (mobileLayout.matches) panel.querySelector('[data-menu-back]').focus();
-      } else if (event.target.closest('[data-menu-back]')) {
-        productsMenu.dataset.view = 'families';
-        productsMenu.querySelector('[aria-pressed="true"]').focus();
       } else if (event.target.closest('a')) {
         productsMenu.hidePopover();
       }
